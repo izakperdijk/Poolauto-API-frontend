@@ -1,0 +1,13 @@
+<div class="container">
+  <form [formGroup]="licenseform" (ngSubmit)="submitQuery()" novalidate>
+    <div *ngIf="validMessage != ''">
+      <h3 class="has-info">{{validMessage}}</h3>
+    </div>
+    <div class="form-group">
+      <label>License plate number</label>
+      <input type="text" class="form-control" formControlName="licenseNumber" required autofocus/>
+    </div>
+    <button type="submit" class="btn btn-primary" >Submit</button>
+  </form>
+</div>
+<pre>{{carInfo | json}}</pre>
