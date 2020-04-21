@@ -1,13 +1,18 @@
 <div class="container">
-  <form [formGroup]="licenseform" (ngSubmit)="submitQuery()" novalidate>
+  <form [formGroup]="licenseForm" (ngSubmit)="submitQuery()" novalidate>
     <div *ngIf="validMessage != ''">
       <h3 class="has-info">{{validMessage}}</h3>
     </div>
     <div class="form-group">
-      <label>License plate number</label>
-      <input type="text" class="form-control" formControlName="licenseNumber" required autofocus/>
+          <label>Input a license plate to retrieve corresponding car information.</label><p></p>
+      <div class="form-control-feedback"
+           *ngIf="licenseForm.errors && (licenseForm.dirty || licenseForm.touched)">
+        <p *ngIf="licenseForm.errors.pattern">The email address must contain at least the @ character</p>
+      </div>
+          <input placeholder="AB123C" id="licensePlate" type="text" class="form-control" formControlName="licensePlate" required autofocus/>
+          <button type="submit" class="btn btn-primary">Submit</button><br>
+          <textarea id="output" cols="30" rows="12" style="resize:none" readonly>{{carInfoString}}</textarea><br>
     </div>
-    <button type="submit" class="btn btn-primary" >Submit</button>
   </form>
+  <button [cdkCopyToClipboard]="carInfoString">Copy to clipboard</button>
 </div>
-<pre>{{carInfo | json}}</pre>

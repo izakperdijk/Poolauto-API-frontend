@@ -1,7 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit, Pipe, PipeTransform} from '@angular/core';
 import { PoolautoAPIBackendService } from '../../services/poolauto-api-backend.service';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
-import {Observable} from 'rxjs';
 
 @Component({
   selector: 'app-home',
@@ -10,25 +9,31 @@ import {Observable} from 'rxjs';
 })
 export class HomeComponent implements OnInit {
 
-  public carInfo;
-  licenseform: FormGroup;
+  public carInfoJSON;
+  public carInfoString;
+  licenseForm: FormGroup;
   validMessage = '';
 
-  constructor(private backend: PoolautoAPIBackendService) { }
+  constructor(private backend: PoolautoAPIBackendService) {
+  }
 
   ngOnInit(): void {
-    this.licenseform = new FormGroup({
-      licenseNumber: new FormControl('', Validators.required)
+    this.licenseForm = new FormGroup({
+      licensePlate: new FormControl('', [
+        Validators.required,
+        Validators.pattern('([a-zA-Z0-9\.]){6}') // Alpha numeric of length 6
+      ])
     });
   }
 
   submitQuery() {
-    if (this.licenseform.valid) {
+    if (this.licenseForm.valid) {
       this.validMessage = 'Processing request.';
-      this.backend.getLicensePlate(this.licenseform.controls.licenseNumber.value).subscribe(
+      this.backend.getLicensePlate(this.licenseForm.controls.licensePlate.value).subscribe(
         data => {
-          this.carInfo = data;
-          this.licenseform.reset();
+          this.carInfoJSON = data;
+          this.carInfoString = this.JSONtoString(this.carInfoJSON);
+          this.licenseForm.reset();
           this.validMessage = '';
           return true;
         },
@@ -38,7 +43,15 @@ export class HomeComponent implements OnInit {
         }
       );
     } else {
-      this.validMessage = 'Please fill out the form before submitting';
+        this.validMessage = 'Please fill out the form before submitting';
     }
   }
+
+  JSONtoString(object) {
+    return JSON.stringify(object, null, 2)
+      .replace(/,/g, '')
+      .replace(/"/g, '')
+      .slice(2, -2);
+  }
+
 }

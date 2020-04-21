@@ -1,0 +1,24 @@
+html {
+  height: 100%;
+}
+
+body {
+  padding-top: 10px;
+  padding-bottom: 10px;
+  text-rendering: optimizeLegibility;
+  position: relative;
+  min-height: 100%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-weight: normal;
+  font-size: 1.0em;
+  background: #FFDFCB;
+}
+
+h1 {
+  font-size: 2.0em;
+}
+
+.table-bordered, .table-bordered td, .table-bordered th {
+  border: 1px solid #2F465D;
+}
