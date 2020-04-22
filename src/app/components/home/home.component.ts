@@ -1,6 +1,7 @@
 import {Component, OnInit, Pipe, PipeTransform} from '@angular/core';
 import { PoolautoAPIBackendService } from '../../services/poolauto-api-backend.service';
-import { FormGroup, FormControl, Validators } from '@angular/forms';
+import {FormGroup, FormControl, Validators, ValidationErrors, ValidatorFn, AbstractControl} from '@angular/forms';
+import {concatMap} from 'rxjs/operators';
 
 @Component({
   selector: 'app-home',
@@ -9,10 +10,24 @@ import { FormGroup, FormControl, Validators } from '@angular/forms';
 })
 export class HomeComponent implements OnInit {
 
-  public carInfoJSON;
-  public carInfoString;
+  carInfoJSON;
+  carInfoString;
   licenseForm: FormGroup;
   validMessage = '';
+  series = [
+    '[A-Z]{2}[0-9]{4}',         // 1
+    '[0-9]{4}[A-Z]{2}',         // 2
+    '[0-9]{2}[A-Z]{2}[0-9]{2}', // 3
+    '[A-Z]{2}[0-9]{2}[A-Z]{2}', // 4
+    '[A-Z]{4}[0-9]{2}',         // 5
+    '[0-9]{2}[A-Z]{4}',         // 6
+    '[0-9]{2}[A-Z]{3}[0-9]{1}', // 7
+    '[0-9]{1}[A-Z]{3}[0-9]{2}', // 8
+    '[A-Z]{2}[0-9]{3}[A-Z]{1}', // 9
+    '[A-Z]{1}[0-9]{3}[A-Z]{2}', // 10
+    '[A-Z]{3}[0-9]{2}[A-Z]{1}'  // 11
+    ];
+  seriesRegEx = new RegExp(this.series.join('|'));
 
   constructor(private backend: PoolautoAPIBackendService) {
   }
@@ -21,7 +36,10 @@ export class HomeComponent implements OnInit {
     this.licenseForm = new FormGroup({
       licensePlate: new FormControl('', [
         Validators.required,
-        Validators.pattern('([a-zA-Z0-9\.]){6}') // Alpha numeric of length 6
+        Validators.pattern('([A-Z0-9\.])*'),
+        Validators.maxLength(6),
+        Validators.minLength(6),
+        this.regexValidator(this.seriesRegEx, {series: ''})
       ])
     });
   }
@@ -43,7 +61,11 @@ export class HomeComponent implements OnInit {
         }
       );
     } else {
+      if (this.licenseForm.get('licensePlate').errors?.required) {
         this.validMessage = 'Please fill out the form before submitting';
+      } else {
+        this.validMessage = 'Wrong input';
+      }
     }
   }
 
@@ -54,4 +76,13 @@ export class HomeComponent implements OnInit {
       .slice(2, -2);
   }
 
+  regexValidator(regex: RegExp, error: ValidationErrors): ValidatorFn {
+    return (control: AbstractControl): {[key: string]: any} => {
+      if (!control.value) {
+        return null;
+      }
+      const valid = regex.test(control.value);
+      return valid ? null : error;
+    };
+  }
 }
