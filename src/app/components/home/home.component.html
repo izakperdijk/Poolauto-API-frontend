@@ -1,13 +1,13 @@
 <div class="container">
   <form [formGroup]="licenseForm" (ngSubmit)="submitQuery()" novalidate>
-      <h3 class="has-info">{{validMessage}}</h3>
     <div class="form-group">
-          <label>Input a license plate to retrieve corresponding car information.</label><p></p>
-          <input placeholder="AB123C" id="licensePlate" type="text" class="form-control" formControlName="licensePlate" autofocus/>
+          <h3 class="has-info">{{feedbackMsg}}</h3>
+          <input id="licensePlate" placeholder="AB123C" type="text" class="form-control"
+                 formControlName="licensePlate" oninput="this.value = this.value.toUpperCase()" autofocus/>
           <button type="submit" class="btn btn-primary" [disabled]="!licenseForm.valid">Submit</button><br>
           <span class = "invalid-feedback">
             <span *ngIf="licenseForm.get('licensePlate').errors?.pattern">
-              Uppercase alphanumeric characters only.
+              Alphanumeric characters only.
             </span>
             <span *ngIf="licenseForm.get('licensePlate').errors?.maxlength">
               Max character limit: 6.

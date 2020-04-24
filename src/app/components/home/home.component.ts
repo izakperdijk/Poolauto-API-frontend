@@ -1,7 +1,6 @@
 import {Component, OnInit, Pipe, PipeTransform} from '@angular/core';
 import { PoolautoAPIBackendService } from '../../services/poolauto-api-backend.service';
 import {FormGroup, FormControl, Validators, ValidationErrors, ValidatorFn, AbstractControl} from '@angular/forms';
-import {concatMap} from 'rxjs/operators';
 
 @Component({
   selector: 'app-home',
@@ -13,8 +12,8 @@ export class HomeComponent implements OnInit {
   carInfoJSON;
   carInfoString;
   licenseForm: FormGroup;
-  validMessage = '';
-  series = [
+  feedbackMsg = 'Input a license plate to retrieve corresponding car information';
+  series = [                    // License plate format series (NL)
     '[A-Z]{2}[0-9]{4}',         // 1
     '[0-9]{4}[A-Z]{2}',         // 2
     '[0-9]{2}[A-Z]{2}[0-9]{2}', // 3
@@ -39,32 +38,35 @@ export class HomeComponent implements OnInit {
         Validators.pattern('([A-Z0-9\.])*'),
         Validators.maxLength(6),
         Validators.minLength(6),
-        this.regexValidator(this.seriesRegEx, {series: ''})
+        this.regexValidator(this.seriesRegEx, {series: 'Unknown format'})
       ])
     });
   }
 
   submitQuery() {
     if (this.licenseForm.valid) {
-      this.validMessage = 'Processing request.';
-      this.backend.getLicensePlate(this.licenseForm.controls.licensePlate.value).subscribe(
+      this.feedbackMsg = 'Processing request.';
+      const input = this.licenseForm.get('licensePlate').value;
+      this.backend.getLicensePlate(input).subscribe(
         data => {
           this.carInfoJSON = data;
           this.carInfoString = this.JSONtoString(this.carInfoJSON);
-          this.licenseForm.reset();
-          this.validMessage = '';
+          this.feedbackMsg = 'Information for ' + input;
           return true;
         },
         error => {
-          this.validMessage = 'No information available for given license plate number';
+          this.feedbackMsg = 'No information available for ' + input;
+          this.carInfoJSON = null;
+          this.carInfoString = null;
           return true;
         }
       );
+      this.licenseForm.reset();
     } else {
       if (this.licenseForm.get('licensePlate').errors?.required) {
-        this.validMessage = 'Please fill out the form before submitting';
+        this.feedbackMsg = 'Please fill out the form before submitting';
       } else {
-        this.validMessage = 'Wrong input';
+        this.feedbackMsg = 'Wrong input';
       }
     }
   }
@@ -73,7 +75,7 @@ export class HomeComponent implements OnInit {
     return JSON.stringify(object, null, 2)
       .replace(/,/g, '')
       .replace(/"/g, '')
-      .slice(2, -2);
+      .slice(2, -2);            // remove the surrounding curly brackets and newlines
   }
 
   regexValidator(regex: RegExp, error: ValidationErrors): ValidatorFn {
