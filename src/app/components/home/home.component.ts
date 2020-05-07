@@ -1,14 +1,14 @@
-import {Component, OnInit, Pipe, PipeTransform} from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { PoolautoAPIBackendService } from '../../services/poolauto-api-backend.service';
-import {FormGroup, FormControl, Validators, ValidationErrors, ValidatorFn, AbstractControl} from '@angular/forms';
+import { FormGroup, FormControl, Validators, ValidationErrors, ValidatorFn, AbstractControl } from '@angular/forms';
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css']
 })
-export class HomeComponent implements OnInit {
 
+export class HomeComponent implements OnInit {
   carInfoJSON;
   carInfoString;
   licenseForm: FormGroup;
@@ -51,11 +51,11 @@ export class HomeComponent implements OnInit {
         data => {
           this.carInfoJSON = data;
           this.carInfoString = this.JSONtoString(this.carInfoJSON);
-          this.feedbackMsg = 'Information for ' + input;
+          this.feedbackMsg = 'Available data for ' + input;
           return true;
         },
         error => {
-          this.feedbackMsg = 'No information available for ' + input;
+          this.feedbackMsg = error.toString();
           this.carInfoJSON = null;
           this.carInfoString = null;
           return true;
@@ -87,4 +87,5 @@ export class HomeComponent implements OnInit {
       return valid ? null : error;
     };
   }
+
 }
