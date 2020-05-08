@@ -28,12 +28,11 @@ export class PoolautoAPIBackendService {
     } else {
       // Backend returned an unsuccessful response code.
       switch (error.status) {
-        case 500:
-          // No information available for query.
+        case 400: // Illegal format
+        case 404: // No data available for query.
           errorMsg = error.error.message;
           break;
-        default:
-          // f.i. 504 Gateway Timeout Error
+        default: // f.i. 504 Gateway Timeout Error
           errorMsg = error.status +
             ' Error, please try again in a few minutes. ' +
             'If the problem persists, please contact an administrator.';

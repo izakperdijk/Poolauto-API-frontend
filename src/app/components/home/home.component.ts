@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { PoolautoAPIBackendService } from '../../services/poolauto-api-backend.service';
 import { FormGroup, FormControl, Validators, ValidationErrors, ValidatorFn, AbstractControl } from '@angular/forms';
+import { LicenseSeries } from './series';
 
 @Component({
   selector: 'app-home',
@@ -13,20 +14,7 @@ export class HomeComponent implements OnInit {
   carInfoString;
   licenseForm: FormGroup;
   feedbackMsg = 'Input a license plate to retrieve corresponding car information';
-  series = [                    // License plate format series (NL)
-    '[A-Z]{2}[0-9]{4}',         // 1
-    '[0-9]{4}[A-Z]{2}',         // 2
-    '[0-9]{2}[A-Z]{2}[0-9]{2}', // 3
-    '[A-Z]{2}[0-9]{2}[A-Z]{2}', // 4
-    '[A-Z]{4}[0-9]{2}',         // 5
-    '[0-9]{2}[A-Z]{4}',         // 6
-    '[0-9]{2}[A-Z]{3}[0-9]{1}', // 7
-    '[0-9]{1}[A-Z]{3}[0-9]{2}', // 8
-    '[A-Z]{2}[0-9]{3}[A-Z]{1}', // 9
-    '[A-Z]{1}[0-9]{3}[A-Z]{2}', // 10
-    '[A-Z]{3}[0-9]{2}[A-Z]{1}'  // 11
-    ];
-  seriesRegEx = new RegExp(this.series.join('|'));
+  seriesRegEx = new RegExp(LicenseSeries.SERIES.join('|'));
 
   constructor(private backend: PoolautoAPIBackendService) {
   }
