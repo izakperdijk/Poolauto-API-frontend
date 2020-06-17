@@ -13,7 +13,7 @@ export class PoolautoAPIBackendService {
   constructor(private http: HttpClient) { }
 
   getLicensePlate(id: string) {
-    return this.http.get('/server/' + id)
+    return this.http.get('http://localhost:8080/' + id)
       .pipe(
         retry(3),
         catchError(this.handleError)
